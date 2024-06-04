@@ -1,0 +1,42 @@
+version: '3.5'
+
+services:
+  postgres:
+    container_name: postgres_container
+    image: postgres:16.3-alpine3.20
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-koumaa}
+      POSTGRES_DB: ${POSTGRES_DB:-jwt_security} # Nama database baru yang ingin dibuat (opsional) Format : ${POSTGRES_DB:-nama_database}
+      PGDATA: /var/lib/postgres/jwt_security # Lokasi Postgres ngambil data dari mana nanti? Format : /var/lib/postgres/nama_database
+    volumes:
+       - postgres:/var/lib/postgres/jwt_security # Lokasi Postgres nyimpen datanya dimana, Format : /var/lib/postgres/nama_database
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+  
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4:8.7
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+       - pgadmin:/var/lib/pgadmin
+
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+    postgres:
+    pgadmin:
