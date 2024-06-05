@@ -7,6 +7,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -16,7 +21,11 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter { // OncePerRequestFilter -> supaya setiap HTTP Request masuk ke sini dulu
 
+    @Autowired
     private final JwtService jwtService;
+
+    @Autowired
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -41,7 +50,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // OncePerRe
 
         /** Filter 2 : Ekstrak JWT token menjadi data aslinya, Check apakah datanya cocok */
         jwtToken = authHeader.substring(7); // ambil token JWT yang asli setelah kata "Bearer " dan spasinya
-        userEmail = JwtService.extractUsername(jwtToken); // ekstrak datanya
-    }
+        userEmail = JwtService.extractUsername(jwtToken); // ekstrak data dari JWT client
 
+        // Jika userEmailnya ada dan user blm ter-authentication maka :
+        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            // Ambil detail user dari database | .loadUserByUsername(userEmail) logicnya ada di ApplicationConfig pada Bean userDetailsService
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+
+            // Jika tokennya Valid maka :
+            if (jwtService.isTokenValid(jwtToken,userDetails)) {
+
+                /** Ini untuk mengenkripsi data User menjadi satu token */
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, // enkripsi data user
+                        null, // enkripsi password | karena make konsep JWT kita gk perlu password
+                        userDetails.getAuthorities() // enkripsi Authorities dalam kasus ini Role
+                );
+
+                /** Ini untuk mensetting detail token yang berisi informasi user, berdasarkan requestnya */
+                authenticationToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+
+                // Update sscurity context holder untuk menyimpan informasi User yang tadi sudah di-enkripsi menjadi token
+                /** Asumsi sementara : SecurityContextHolder merupakan tempat untuk menyimpan informasi User supaya bisa diakses oleh Controller lainnya */
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
+        }
+        filterChain.doFilter(request,response);
+    }
 }
