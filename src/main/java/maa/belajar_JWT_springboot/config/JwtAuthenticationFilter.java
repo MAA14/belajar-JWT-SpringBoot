@@ -16,7 +16,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter { // OncePerRequestFilter -> supaya setiap HTTP Request masuk ke sini dulu
 
-    @Autowired
     private final JwtService jwtService;
 
     @Override

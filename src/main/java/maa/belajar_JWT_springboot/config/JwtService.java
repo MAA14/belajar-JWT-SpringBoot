@@ -21,7 +21,7 @@ public class JwtService {
     // Ini keynya pake Random Generator dari "https://generate-random.org/encryption-key-generator?count=1&bytes=256&cipher=aes-256-cbc&string=&password="
     private static final String SECRET_KEY = "6imUScP5CgJImn6GUNyj+akb4hJmJ883JBEchvQ1V5fag8G3tD5ZnPJSV+Ubyr2czN+F11lv1BfISoS4nMccDZlKqtzLbSp4Bqzfaovtffz10UyvXeoPhQ3VOFOoL2pkD5CzO1GVsVvipA5gpkrrIAmEjPnZalpEQQ8Xuw0JSiL6ogt6tyI5qAHCoJNHgsi0EHfVo07hVIWXSgFC44PzkaW2YtSe3eRft9N2AZMR21xsqyHGrzZ5Yce+0zmiSVTydt9V1emz1csi22NjbWlYmYk4ovDNk/brNDOpcK1oLfVoRDaFgkX/TOKjYfyhfbyNql0tHgysL4md8YehSs+9OcTcNOPEzeX4DhrnWzDueqQ=";
 
-    public String extractUsername(String jwtToken) {
+    public static String extractUsername(String jwtToken) {
         return extractClaim(
                 jwtToken,
                 Claims::getSubject /** sama aja kayak (Claims claims) -> claims.getSubject() */
@@ -30,7 +30,7 @@ public class JwtService {
     }
 
     /** Method untuk mengekstrak satu data aja dalam JWT -> data = claims */
-    public <T> T extractClaim(
+    public static <T> T extractClaim(
             String jwtToken, /** Input: String = "token-jwt" */
             Function<Claims, T> claimsResolver  /** Input: Claims::method() || method(Claims claims) -> claims.method() */
             // Parameter ini harus berupa fungsi dengan Param input harus object Claims dan harus punya return <T>
@@ -52,7 +52,7 @@ public class JwtService {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24)) // Expired setelah 24 Jam
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256) // SignInKey adalah Key milik kita dan Algorithmanya untuk contoh gunakan HS256
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256) // SignInKey adalah Key milik kita dan Algoritmanya untuk kasus saat ini menggunakan HS256
                 .compact();
     }
 
@@ -78,7 +78,7 @@ public class JwtService {
     }
 
     /** Method untuk mengekstrak seluruh data dalam JWT token -> data = Claims */
-    private Claims extractAllClaims(String jwtToken) {
+    private static Claims extractAllClaims(String jwtToken) {
         return Jwts
                 .parserBuilder()
                 .setSigningKey(getSignInKey())
@@ -91,7 +91,7 @@ public class JwtService {
      * Decode Sign Key harus memperhatikan Algoritma apa yang digunakan oleh JWT kita,
      * pada kasus ini kita menggunakan HS256 dan Encryption Code 256 bit
      * */
-    private Key getSignInKey() {
+    private static Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes); // Karena kita make algoritma HS256 jadi pake method hmacSha
     }
