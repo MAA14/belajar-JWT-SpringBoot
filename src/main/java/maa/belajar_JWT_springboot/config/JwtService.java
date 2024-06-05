@@ -47,7 +47,7 @@ public class JwtService {
 
     /** Note:
      * Decode Sign Key harus memperhatikan Algoritma apa yang digunakan oleh JWT kita,
-     * pada kasus ini kita menggunakan HSA256 dan Encryption Code 256 bit
+     * pada kasus ini kita menggunakan HS256 dan Encryption Code 256 bit
      * */
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
