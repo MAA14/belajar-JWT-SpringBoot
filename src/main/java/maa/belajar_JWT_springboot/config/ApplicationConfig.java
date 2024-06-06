@@ -5,8 +5,12 @@ import maa.belajar_JWT_springboot.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @RequiredArgsConstructor
@@ -29,5 +33,23 @@ public class ApplicationConfig {
             }
         };
          */
+    }
+
+    /**
+     * AuthenticationProvider adalah Data Access Object (DAO) yang dapat mengambil data dari UserDetails seperti Username dan Password
+     * Disini juga tempat terjadinya pengecekan username dan password
+     */
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsService()); // Menentukan Class atau Object seperti apa yang ingin di Access datanya
+        authenticationProvider.setPasswordEncoder(passwordEncoder()); // Menentukan Algorithma yang dapat men-Encode password User dari Database kita
+        return authenticationProvider;
+    }
+
+    // Pake BCrypt untuk men-Encode password
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
