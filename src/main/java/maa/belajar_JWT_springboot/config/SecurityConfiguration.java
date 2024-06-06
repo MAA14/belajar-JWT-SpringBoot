@@ -33,14 +33,18 @@ public class SecurityConfiguration {
                             .permitAll()
                             .anyRequest()
                             .authenticated();
+                            /** menentukan link mana saja yang bisa masuk tanpa login berdasarkan REGEX, dan sisanya harus login */
                 })
                 .sessionManagement((sessionManagementCustomizer) -> {
-                    // Membuat Session baru untuk setiap request baru
                     sessionManagementCustomizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                    /** Menentukan kebijakan untuk selalu membuat Session baru untuk setiap request baru */
                 })
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-                // Masukin Filter Class yang kita bikin manual serta type Class yang disetting ke SecurityContextHolder
+                /** addFilterBefore(param1, param2)
+                 * param1 = class AuthenticationFilter yang telah kita buat
+                 *  param2 = class yang kita Set kedalam SecurityContextHolder (lihat file JwtAuthenticationFilter line 77)
+                 *  */
 
         return httpSecurity.build();
     }
