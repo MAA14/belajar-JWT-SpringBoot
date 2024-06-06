@@ -26,18 +26,18 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .csrf(AbstractHttpConfigurer::disable) // Mematikan CSRF protection (tidak disarankan tapi ikutin tutorial dulo aja)
+                .csrf(AbstractHttpConfigurer::disable) // Mematikan CSRF protection (tidak disarankan tapi ikutin tutorial dulu aja)
                 .authorizeHttpRequests((request) -> {
                     request
                             .requestMatchers("")
                             .permitAll()
                             .anyRequest()
                             .authenticated();
-                            /** menentukan link mana saja yang bisa masuk tanpa login berdasarkan REGEX, dan sisanya harus login */
+                            // menentukan link mana saja yang bisa masuk tanpa login berdasarkan REGEX, dan sisanya harus login
                 })
                 .sessionManagement((sessionManagementCustomizer) -> {
                     sessionManagementCustomizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-                    /** Menentukan kebijakan untuk selalu membuat Session baru untuk setiap request baru */
+                    // Menentukan kebijakan untuk selalu membuat Session baru untuk setiap request baru
                 })
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
