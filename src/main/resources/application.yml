@@ -13,6 +13,7 @@ spring:
         format_sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  security.enable-csrf: false
 
 application:
   name: belajar-JWT-springboot
