@@ -5,8 +5,10 @@ import maa.belajar_JWT_springboot.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -45,6 +47,15 @@ public class ApplicationConfig {
         authenticationProvider.setUserDetailsService(userDetailsService()); // Menentukan Class atau Object seperti apa yang ingin di Access datanya
         authenticationProvider.setPasswordEncoder(passwordEncoder()); // Menentukan Algorithma yang dapat men-Encode password User dari Database kita
         return authenticationProvider;
+    }
+
+    /**
+     * Authentication Manager merupakan tempat kumpulan Method-Method
+     * yang dapat membantu kita dalam melakukan Authenticate user berdasarkan Username dan Password
+     * */
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 
     // Pake BCrypt untuk men-Encode password
