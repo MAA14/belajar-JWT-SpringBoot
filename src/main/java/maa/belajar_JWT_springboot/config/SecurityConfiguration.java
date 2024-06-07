@@ -29,7 +29,7 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable) // Mematikan CSRF protection (tidak disarankan tapi ikutin tutorial dulu aja)
                 .authorizeHttpRequests((request) -> {
                     request
-                            .requestMatchers("")
+                            .requestMatchers("/api/v1/auth/**")
                             .permitAll()
                             .anyRequest()
                             .authenticated();
